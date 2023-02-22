@@ -20,79 +20,62 @@ import Task from './components/Task';
 
 export default function App() {
 
-  const [task, setTask] = useState()
-  const [taskItems, setTaskItems] = useState([])
+  const [taskText, setTaskText] = useState('');
+  const [showClosedList, setShowClosedList] = useState(false); // State variable to keep track of which button was pressed
+
+  const [openTasks, setOpenTasks] = useState([]);
+  const [closedTasks, setClosedTasks] = useState([]);
+
 
   const handleAddTask = () => {
-    Keyboard.dismiss()
-    setTaskItems([...taskItems, task])
-    setTask(null)
-  }
+    if (taskText.trim() !== '') {
+      setOpenTasks([...openTasks, taskText]);
+      setTaskText('');
+    }
+  };
 
-  const completeTask = (index) => {
-    let itemsCopy = [...taskItems]
-    itemsCopy.splice(index, 1)
-    setTaskItems(itemsCopy)
-  }
+  const handleAddClosedTask = () => {
+    if (taskText.trim() !== '') {
+      if (closedTasks.length < 3) {
+        setClosedTasks([...closedTasks, taskText]);
+        setTaskText('');
+      } else {
+        Alert.alert('Maximum of 3 tasks reached in closed list');
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* todays tasks */}
       <View style={styles.taskWrapper}>
         <Text style={styles.sectionTitle}>Open List</Text>
-
         <View style={styles.items}>
-          {/* this is where the tasks will go */}
-          {
-            taskItems.map((item, index) => {
-              return (
-                <TouchableOpacity key={index}>
-                  <Task key={index} text={item} onPress={() => completeTask(index)} />
-                </TouchableOpacity>
-
-              )
-            })
-          }
+          {openTasks.map((task, index) => (
+            <Task key={index} text={task} onPress={() => setOpenTasks(openTasks.filter((_, i) => i !== index))} />
+          ))}
+        </View>
+        <Text style={styles.sectionTitle}>Closed List</Text>
+        <View style={styles.items}>
+          {closedTasks.map((task, index) => (
+            <Task key={index} text={task} isClosed onPress={() => setClosedTasks(closedTasks.filter((_, i) => i !== index))} />
+          ))}
         </View>
       </View>
-
-      {/* closed list container*/}
-      <View style={styles.closedListWrapper}>
-        {/* Closed List*/}
-        <View>
-          <Text style={styles.closedListTitle}>Closed List</Text>
-        </View>
-
-        {/* closed list items will go here */}
-
-       
-
-
+      <View style={styles.writeTaskWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder="Add a task"
+          value={taskText}
+          onChangeText={(text) => setTaskText(text)}
+        />
+        <TouchableOpacity style={styles.addWrapper} onPress={showClosedList ? handleAddClosedTask : handleAddTask}>
+          <Text style={styles.addText}>{showClosedList ? 'C' : '+'}</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* write a task */}
-      <KeyboardAvoidingView
-        behaviour={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.writeTaskWrapper}
-      >
-        <TextInput style={styles.input} placeholder={'Write a task'} value={task} onChangeText={text => setTask(text)} />
-
-        <TouchableOpacity onPress={() => handleAddTask()}>
-          <View style={styles.addWrapper}>
-            <Text style={styles.addText}>+</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* button to add to closed list*/}
-        <TouchableOpacity onPress={() => handleAddTask()}>
-          <View style={styles.addWrapper}>
-            <Text style={styles.addText}>C</Text>
-          </View>
-        </TouchableOpacity>
-
-      </KeyboardAvoidingView>
+      <TouchableOpacity style={styles.toggleClosedListBtn} onPress={() => setShowClosedList(!showClosedList)}>
+        <Text style={styles.toggleClosedListBtnText}>{showClosedList ? 'Show Open List' : 'Show Closed List'}</Text>
+      </TouchableOpacity>
     </View>
-   
   );
 }
 
@@ -149,7 +132,6 @@ const styles = StyleSheet.create({
   
   closedListWrapper: {
     paddingHorizontal: 20,
-
   }
   
 });

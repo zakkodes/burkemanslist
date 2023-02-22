@@ -8,6 +8,7 @@ const Task = (props) => {
   const { text, onPress, isClosed } = props;
   const [isCompleted, setIsCompleted] = useState(false)
 
+
   const toggleComplete = () => {
     setIsCompleted(!isCompleted)
   }
@@ -16,16 +17,32 @@ const Task = (props) => {
     <View style={[styles.item, isClosed && styles.closedItem]}>
       <View style={styles.itemLeft}>
         <View style={[styles.square, isClosed && styles.closedSquare]}></View>
-        <Text style={styles.itemText}>{props.text}</Text>
+        <Text style={[styles.itemText, isCompleted && styles.completedText]}>{text}</Text>
       </View>
-      <View style={styles.circular}>
-        <Icon name="check" size={12} color="#808080" />
-      </View>
+    
+
+      {!isClosed && (
+        <View style={styles.circular}>
+          <TouchableOpacity onPress={toggleComplete}>
+            {isCompleted ? (
+              <Icon name="check" size={12} color="#808080" />
+            ) : (
+              <View style={styles.circle}></View>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+      
       <TouchableOpacity onPress={onPress}>
         <Icon name="trash" size={24} color="#FF0000" />
       </TouchableOpacity>
-    </View>
 
+      {/* {!isClosed && (
+        <TouchableOpacity onPress={addToClosedList}>
+          <Text style={styles.addToClosedList}>C</Text>
+        </TouchableOpacity>
+      )} */}
+    </View>
   )
 }
 
@@ -70,6 +87,15 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   
+  closedSquare: {
+    backgroundColor: "#E8EAED",
+    opacity: 1,
+  },
+
+  completedText: {
+    textDecorationLine: "line-through",
+    color: "#808080",
+  },
 
 })
 
